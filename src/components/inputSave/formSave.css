@@ -1,0 +1,29 @@
+form {
+	display: grid;
+	grid-template-columns: 30% 1fr;
+	grid-template-rows: auto;
+	grid-gap: 20px;
+	margin-bottom: 20px;
+	position: relative;
+}
+
+.input-save__btn {
+	grid-area: 3 / 1 / 4 / 3;
+}
+
+.api-message {
+	grid-area: 4 / 1 / 5 / 3;
+	animation: response 2s ease-out;
+	animation-fill-mode: forwards;
+}
+
+@keyframes response{
+    from {
+		opacity :1;
+		max-height: 100px;
+	}
+    to {
+		opacity: 0;
+		max-height: 0;
+	}
+}

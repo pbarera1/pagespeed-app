@@ -2,14 +2,29 @@
   "name": "page-speed",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:8080",
   "dependencies": {
+    "@material-ui/core": "^3.9.3",
+    "body-parser": "^1.18.3",
+    "chart.js": "^2.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^7.0.0",
+    "express": "^4.16.4",
+    "mongoose": "^5.4.19",
+    "node-cron": "^2.0.3",
+    "node-fetch": "^2.3.0",
+    "nodemon": "^1.18.10",
+    "prop-types": "^15.7.2",
     "react": "^16.8.4",
-    "react-dom": "^16.8.4"
+    "react-chartkick": "^0.3.0",
+    "react-dom": "^16.8.4",
+    "react-router-dom": "^5.0.0"
   },
   "devDependencies": {
     "react-scripts": "2.1.8"
   },
   "scripts": {
+    "node": "nodemon server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

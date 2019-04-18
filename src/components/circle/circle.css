@@ -1,0 +1,35 @@
+.circle {
+	position: relative;
+}
+
+.circle.red > div {
+	color: red;
+}
+
+.circle.orange > div {
+	color: orange;
+}
+
+.circle.green > div {
+	color: green;
+}
+
+.circle__value {
+	position: absolute;
+	font-size: 40px;
+	animation: fadeIn 1s ease-in;
+	animation-fill-mode: forwards;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	text-align: center;
+}
+
+@keyframes fadeIn{
+    from {
+		opacity: 0;
+	}
+    to {
+		opacity: 1;
+	}
+}

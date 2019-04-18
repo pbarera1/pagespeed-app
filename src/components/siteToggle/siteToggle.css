@@ -1,0 +1,24 @@
+ul {
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-flow: row wrap;
+	list-style-type: none;
+	background-color: #fff;
+}
+
+ul > li {
+	display: flex;
+}
+
+a {
+	text-decoration: none;
+	padding: 20px;
+	color: #000;
+	font-size: 14px;
+}
+
+a.active {
+	border-bottom: 2px solid blue;
+	font-weight: bold;
+}
