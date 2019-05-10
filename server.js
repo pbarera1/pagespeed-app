@@ -1,18 +1,22 @@
 require('dotenv').config();
 const cron = require('node-cron');
 const fs = require('fs');
+const path = require('path');
 const cors = require('cors');
 const fetch = require('node-fetch');
 const express = require('express');
 const bodyParser = require('body-parser');
 const pagespeed = require('./routes/pagespeed.route');
 const app = express();
-const API_KEY = 'AIzaSyA0Cor9_jQcLo50sgYfYM70_I-tsxQKuzw';
+const API_KEY = process.env.GOOGLE_API_KEY;
 const API_BASE = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
+
+const dev = process.env.NODE_ENV !== 'production';
+const serverUrl = dev ? 'http://localhost' : 'http://psi.recoverybrands.com';
 
 // Set up mongoose connection
 const mongoose = require('mongoose');
-let mongoDB = 'mongodb://pbarera:luI8^M4d9P%1@ds015909.mlab.com:15909/page-speed';
+const mongoDB = process.env.MONGODB_URI;
 
 mongoose.connect(encodeURI(mongoDB));
 mongoose.Promise = global.Promise;
@@ -23,6 +27,15 @@ app.use(cors());
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use('/pagespeed', pagespeed);
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.get('/', function(req, res) {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
+app.get('*', function(req, res) {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 let port = 8080;
 
@@ -48,7 +61,9 @@ const pageSpeedFetch = async templateData => {
             originLoadingExperience: data.originLoadingExperience.overall_category,
             lighthousePerformanceScore:
                 data.lighthouseResult.categories.performance.score,
-            googleId: data.id,
+            product: templateData.product,
+            site: templateData.site,
+            pageUrl: templateData.pageUrl,
             templateId: templateData._id,
             date: Date.now()
         };
@@ -60,35 +75,30 @@ const pageSpeedFetch = async templateData => {
     }
 };
 
-// 0 0 0 * * * everday at midnight or * * * * * every minute
-cron.schedule('* * * * *', async function() {
-    console.log('running a task every minute');
+// 0 0 * * * everday at midnight or * * * * * every minute or 12:15 15 0 * * *
+cron.schedule('15 0 * * *', async function() {
+    console.log('running a task at 12:15');
     //mongo call to get saved templates
     let templates;
     try {
-        response = await fetch(`http://localhost:8080/pagespeed/get-templates`);
+        response = await fetch(`${serverUrl}/pagespeed/get-templates`);
         templates = await response.json();
     } catch (error) {
         throw new Error(error.message);
     }
-    console.log(templates);
+    // console.log(templates);
     Array.isArray(templates) &&
         templates.forEach(async template => {
             // how do I assciate the pagespeed object with its corresponding template schema
             const data = await pageSpeedFetch(template);
-
-            const savePagespeedData = await fetch(
-                'http://localhost:8080/pagespeed/create',
-                {
-                    method: 'POST',
-                    // mode: 'no-cors',
-                    body: JSON.stringify({...data}),
-                    headers: {
-                        'Content-type': 'application/json'
-                    }
+            const savePagespeedData = await fetch(`${serverUrl}/pagespeed/create`, {
+                method: 'POST',
+                // mode: 'no-cors',
+                body: JSON.stringify({...data}),
+                headers: {
+                    'Content-type': 'application/json'
                 }
-            );
-            // console.log(savePagespeedData);
+            });
             const success = await savePagespeedData.text();
             console.log(success);
         });

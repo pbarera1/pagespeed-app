@@ -1,0 +1,5 @@
+button.active {
+	background: blue;
+	color: #fff;
+	outline: 0;
+}

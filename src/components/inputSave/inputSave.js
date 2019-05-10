@@ -8,7 +8,8 @@ class InputSave extends Component {
         pageUrl: this.props.data.pageUrl || '',
         id: this.props.data._id || '',
         message: '',
-        error: ''
+        error: '',
+        isInDatabase: this.props.data.pageUrl
     };
 
     handleChange1 = event => {
@@ -20,26 +21,23 @@ class InputSave extends Component {
     };
 
     handleSubmit = async e => {
-        console.log('submit');
         const {templateName, pageUrl} = this.state;
         const path = this.props.location.pathname.replace('-', '.');
         const site = path.split('/').slice(-1)[0];
         const product = path.split('/').slice(-2)[0];
-        let templateData = {templateName, pageUrl, product, site};
+        const date = Date.now();
+        let templateData = {templateName, pageUrl, product, site, date};
 
         // save to mongo
         try {
-            let response = await fetch(
-                'http://localhost:8080/pagespeed/create-template',
-                {
-                    method: 'POST',
-                    // mode: 'no-cors',
-                    body: JSON.stringify(templateData),
-                    headers: {
-                        'Content-type': 'application/json'
-                    }
+            let response = await fetch('/pagespeed/create-template', {
+                method: 'POST',
+                // mode: 'no-cors',
+                body: JSON.stringify(templateData),
+                headers: {
+                    'Content-type': 'application/json'
                 }
-            );
+            });
             let data = await response.json();
             this.setState({
                 isFetching: false,
@@ -54,6 +52,7 @@ class InputSave extends Component {
     };
 
     render() {
+        const {isInDatabase} = this.state;
         const inputHasValue = this.state.templateName || this.state.pageUrl;
         const message = this.state.error || this.state.message;
         return (
@@ -73,6 +72,7 @@ class InputSave extends Component {
                         placeholder="Enter Template Name"
                         value={this.state.templateName}
                         onChange={this.handleChange1}
+                        readOnly={isInDatabase}
                     />
                     <div
                         style={{
@@ -87,14 +87,18 @@ class InputSave extends Component {
                         placeholder="Enter URL"
                         value={this.state.pageUrl}
                         onChange={this.handleChange2}
+                        readOnly={isInDatabase}
                     />
-                    <button
-                        className="input-save__btn"
-                        type="button"
-                        disabled={!inputHasValue}
-                        onClick={this.handleSubmit}>
-                        Save
-                    </button>
+                    {!isInDatabase && (
+                        <button
+                            className="input-save__btn"
+                            type="button"
+                            disabled={!inputHasValue}
+                            onClick={this.handleSubmit}>
+                            Save
+                        </button>
+                    )}
+
                     {message && (
                         <div
                             className="api-message"

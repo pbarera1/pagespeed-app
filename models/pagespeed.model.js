@@ -7,8 +7,10 @@ let PagespeedDataSchema = new Schema(
         originLoadingExperience: String,
         lighthousePerformanceScore: Number,
         date: Date,
-        googleId: String,
-        template: [{type: Schema.Types.ObjectId, ref: 'Template'}]
+        site: String,
+        product: String,
+        pageUrl: String,
+        tempateId: String
     },
     {strict: false}
 );

@@ -9,7 +9,7 @@ const siteToggle = props => {
     const siteText = path.split('/').slice(-1)[0];
     const getSites = () => {
         const sites = {
-            aac: ['americanaddictioncenters.com'],
+            aac: ['americanaddictioncenters.org'],
             facility: [
                 'deserthopetreatment.com',
                 'lagunatreatment.com',
@@ -43,7 +43,6 @@ const siteToggle = props => {
         return sites[product];
     };
 
-    const sites = ['amricanaddictionceners.com', 'ho'];
     return (
         <ul>
             {getSites().map((site, index) => {
@@ -51,7 +50,10 @@ const siteToggle = props => {
                 const isActive = site === siteText.replace('-', '.') ? true : false;
                 return (
                     <li key={index}>
-                        <Link className={isActive ? 'active' : ''} to={url}>
+                        <Link
+                            className={isActive ? 'active' : ''}
+                            to={url}
+                            onClick={() => props.updatePage(url)}>
                             {site}
                         </Link>
                     </li>

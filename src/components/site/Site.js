@@ -10,7 +10,9 @@ const Site = class Site extends Component {
     state = {
         isFetching: true,
         error: null,
-        templates: []
+        templates: [],
+        pagespeedData: [],
+        currentPage: null
     };
 
     async componentDidMount() {
@@ -18,13 +20,16 @@ const Site = class Site extends Component {
         const path = this.props.location.pathname.replace('-', '.');
         const product = path.split('/').slice(-2)[0];
         const site = path.split('/').slice(-1)[0];
+        console.log(site);
         try {
-            let response = await fetch(
-                `http://localhost:8080/pagespeed/get-templates/${product}/${site}`
-            );
-            let data = await response.json();
+            let response1 = await fetch(`/pagespeed/get-templates/${product}/${site}`);
+            let response2 = await fetch(`/pagespeed/get-pagespeeds/${site}`);
+            let data = await response1.json();
+            let pagespeedData = await response2.json();
+            console.log(pagespeedData);
             this.setState(prevState => ({
                 templates: [...prevState.templates, ...data],
+                pagespeedData,
                 isFetching: false
             }));
         } catch (error) {
@@ -34,6 +39,10 @@ const Site = class Site extends Component {
             });
         }
     }
+
+    updatePage = (path = '/') => {
+        this.setState({currentPage: path});
+    };
 
     addTemplate = () => {
         this.setState(prevState => ({
@@ -69,7 +78,7 @@ const Site = class Site extends Component {
         });
         //remove site from state and mongobd
         try {
-            let response = await fetch(`http://localhost:8080/pagespeed/delete/${id}`, {
+            let response = await fetch(`/pagespeed/delete/${id}`, {
                 method: 'DELETE',
                 // mode: 'no-cors',
                 headers: {
@@ -94,8 +103,7 @@ const Site = class Site extends Component {
     };
 
     render() {
-        const {error, isFetching, templates} = this.state;
-        console.log(templates);
+        const {error, isFetching, templates, pagespeedData} = this.state;
         // if (error) {
         //     return <div>Error: {error.message}</div>;
         // } else
@@ -115,20 +123,20 @@ const Site = class Site extends Component {
         } else {
             return (
                 <>
-                    <SiteToggle />
+                    <SiteToggle callback={this.updatePage} />
                     <div className="container">
                         <DashOverview
                             title="Average Site Data"
                             desc="The average of all your tracked site templates"
-                            data={templates}
+                            pagespeedData={pagespeedData}
                         />
                         {this.state.templates.map((template, index) => {
                             return (
                                 <DashWidget
                                     key={index}
                                     removeTemplate={e => this.removeTemplate(index)}
-                                    data={template}
-                                    pagespeedIds={template.pagespeedData}
+                                    template={template}
+                                    pagespeedData={pagespeedData}
                                 />
                             );
                         })}

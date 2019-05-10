@@ -2,15 +2,15 @@ const Pagespeed = require('../models/pagespeed.model');
 const Template = require('../models/template.model');
 const mongoose = require('mongoose');
 
-Template.find({})
-    // findById(req.body.templateId)
-    .populate('pagespeedData')
-    .exec(function(err, template) {
-        if (err) return console.log(err);
-        console.log('The author is %s', template);
-        // prints "The author is Ian Fleming"
-        // _id: req.body.templateId
-    });
+// Template.find({})
+//     // findById(req.body.templateId)
+//     .populate('pagespeedData')
+//     .exec(function(err, template) {
+//         if (err) return console.log(err);
+//         console.log('populating templates with apgespeed IDs');
+//         // prints "The author is Ian Fleming"
+//         // _id: req.body.templateId
+//     });
 
 exports.pagespeed_create = function(req, res) {
     let pagespeed = new Pagespeed(req.body);
@@ -40,6 +40,19 @@ exports.pagespeed_get = function(req, res) {
             res.send(pagespeed);
         }
     );
+};
+
+exports.pagespeed_get_site = function(req, res) {
+    const url = req.params.site;
+
+    Pagespeed.find({siteUrl: {$regex: url, $options: 'i'}}, function(err, pagespeed) {
+        if (err) {
+            res.send({message: err.message});
+            return;
+        }
+        // console.log(pagespeed);
+        res.send(pagespeed);
+    });
 };
 
 exports.template_create = function(req, res) {

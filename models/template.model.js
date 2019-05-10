@@ -7,7 +7,7 @@ let TemplateDataSchema = new Schema(
         pageUrl: String,
         product: String,
         site: String,
-        pagespeedData: [{type: Schema.Types.ObjectId, ref: 'PagespeedData'}]
+        date: Date
     },
     {strict: false}
 );
